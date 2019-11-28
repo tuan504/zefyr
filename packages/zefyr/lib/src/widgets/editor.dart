@@ -4,6 +4,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:zefyr/src/widgets/attr_delegate.dart';
 
 import 'controller.dart';
 import 'editable_text.dart';
@@ -28,6 +29,7 @@ class ZefyrEditor extends StatefulWidget {
     this.imageDelegate,
     this.searchDelegate,
     this.selectionControls,
+    this.attrDelegate,
     this.physics,
     this.keyboardAppearance,
   })  : assert(mode != null),
@@ -55,6 +57,8 @@ class ZefyrEditor extends StatefulWidget {
 
   /// Optional delegate for customizing this editor's toolbar.
   final ZefyrToolbarDelegate toolbarDelegate;
+
+  final ZefyrAttrDelegate attrDelegate;
 
   /// Delegate for resolving embedded images.
   ///
@@ -87,6 +91,7 @@ class ZefyrEditor extends StatefulWidget {
 
 class _ZefyrEditorState extends State<ZefyrEditor> {
   ZefyrImageDelegate _imageDelegate;
+  ZefyrAttrDelegate _attrDelegate;
   ZefyrScope _scope;
   ZefyrThemeData _themeData;
   GlobalKey<ZefyrToolbarState> _toolbarKey;
@@ -135,6 +140,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   void initState() {
     super.initState();
     _imageDelegate = widget.imageDelegate;
+    _attrDelegate = widget.attrDelegate;
   }
 
   @override
@@ -146,6 +152,10 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     if (widget.imageDelegate != oldWidget.imageDelegate) {
       _imageDelegate = widget.imageDelegate;
       _scope.imageDelegate = _imageDelegate;
+    }
+    if (widget.attrDelegate != oldWidget.attrDelegate) {
+      _attrDelegate = widget.attrDelegate;
+      _scope.attrDelegate = _attrDelegate;
     }
   }
 
@@ -162,6 +172,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       _scope = ZefyrScope.editable(
         mode: widget.mode,
         imageDelegate: _imageDelegate,
+        attrDelegate: _attrDelegate,
         controller: widget.controller,
         focusNode: widget.focusNode,
         focusScope: FocusScope.of(context),
