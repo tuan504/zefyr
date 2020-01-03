@@ -175,6 +175,11 @@ class InputConnectionController implements TextInputClient {
   }
 
   @override
+  // TODO: implement currentTextEditingValue
+  TextEditingValue get currentTextEditingValue =>
+      _lastKnownRemoteTextEditingValue;
+
+  @override
   void connectionClosed() {
     if (hasConnection) {
       _textInputConnection.connectionClosedReceived();
