@@ -22,7 +22,7 @@ import 'scope.dart';
 import 'selection.dart';
 import 'theme.dart';
 
-const expandable = false;
+const expandable = true;
 
 /// Core widget responsible for editing Zefyr documents.
 ///
