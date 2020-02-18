@@ -420,8 +420,8 @@ class EmbedAttributeBuilder
   NotusAttribute<Map<String, dynamic>> get unset => EmbedAttribute._(null);
 
   @override
-  NotusAttribute<Map<String, dynamic>> withValue(Map<String, dynamic> value) =>
-      EmbedAttribute._(value);
+  NotusAttribute<Map<String, dynamic>> withValue(Map value) =>
+      EmbedAttribute._(value.cast<String, dynamic>());
 }
 
 /// Type of embedded content.

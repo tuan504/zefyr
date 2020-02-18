@@ -187,7 +187,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
     } else if (embed.type == EmbedType.image) {
       return ZefyrImage(node: node, delegate: scope.imageDelegate);
     } else if (embed.type == EmbedType.block) {
-      return ZefyrSubBlock(node: node);
+      return ZefyrSubBlock(node: node, searchDelegate: scope.searchDelegate);
     } else {
       throw UnimplementedError('Unimplemented embed type ${embed.type}');
     }

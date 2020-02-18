@@ -7,17 +7,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/zefyr.dart';
 
-import 'editable_box.dart';
+import 'image.dart';
 
 class ZefyrSubBlock extends StatelessWidget {
-  ZefyrSubBlock({@required this.node}) : assert(node != null);
+  final ZefyrSearchDelegate searchDelegate;
+  ZefyrSubBlock({@required this.node, this.searchDelegate, Key key})
+      : assert(node != null),
+        super(key: key);
 
   final EmbedNode node;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container(color: Colors.green, padding: EdgeInsets.all(8.0));
+    final theme = ZefyrTheme.of(context);
+    // final cont = Container(color: Colors.green, padding: EdgeInsets.all(8.0));
+    EmbedAttribute attribute = node.style.get(NotusAttribute.embed);
+    final source = attribute.value['source'] as String;
+
+    Widget child;
+    print('searchDel: ${searchDelegate}');
+    if (searchDelegate == null) {
+      child = Container(color: Colors.green, padding: EdgeInsets.all(8.0));
+    } else {
+      final futureWidget = searchDelegate.buildBlock(source);
+      child = FutureBuilder(
+          builder: (context, AsyncSnapshot<Widget> widget) => widget.data,
+          future: futureWidget);
+    }
+    return AnEditableImage(
+      child: Padding(
+          padding: theme.defaultLineTheme.padding,
+          child: Container(
+            child: child,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.green, width: 4)),
+            // padding: EdgeInsets.all(8.0)
+          )),
+      node: node,
+    );
   }
 }
