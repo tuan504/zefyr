@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
@@ -29,7 +30,7 @@ class FullPageEditorScreen extends StatefulWidget {
   @override
   _FullPageEditorScreenState createState() => _FullPageEditorScreenState();
 }
-
+final initDoc = r'[{"insert":"New Text 1\n"}]';
 final doc =
     r'[{"insert":"Zefyr"},{"insert":"\n","attributes":{"heading":1}},{"insert":"Soft and gentle rich text editing for Flutter applications.","attributes":{"i":true}},{"insert":"\n"},{"insert":"​","attributes":{"embed":{"type":"image","source":"asset://images/breeze.jpg"}}},{"insert":"\n"},{"insert":"Photo by Hiroyuki Takeda.","attributes":{"i":true}},{"insert":"\nZefyr is currently in "},{"insert":"early preview","attributes":{"b":true}},{"insert":". If you have a feature request or found a bug, please file it at the "},{"insert":"issue tracker","attributes":{"a":"https://github.com/memspace/zefyr/issues"}},{"insert":'
     r'".\nDocumentation"},{"insert":"\n","attributes":{"heading":3}},{"insert":"Quick Start","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/quick_start.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Data Format and Document Model","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/data_and_document.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Style Attributes","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/attr'
@@ -44,24 +45,29 @@ Delta getDelta() {
 enum _Options { darkTheme }
 
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
-  final ZefyrController _controller =
-      ZefyrController(NotusDocument.fromDelta(getDelta()));
-  final FocusNode _focusNode = FocusNode();
+ // ZefyrController _richController = ZefyrController(NotusDocument.fromJson(json.decode(doc)));
+  // final ZefyrController _controller =
+  //  ZefyrController(NotusDocument.fromDelta(getDelta()));
+ // final FocusNode _focusNode = FocusNode();
   bool _editing = false;
-  StreamSubscription<NotusChange> _sub;
+ // StreamSubscription<NotusChange> _sub;
   bool _darkTheme = false;
+  var richTextString = List();
 
   @override
   void initState() {
     super.initState();
-    _sub = _controller.document.changes.listen((change) {
-      print('${change.source}: ${change.change}');
-    });
+    richTextString.add(initDoc);
+  //  _sub = _richController.document.changes.listen((change) {
+  //    print('${change.source}: ${change.change}');
+  //  });
+
+
   }
 
   @override
   void dispose() {
-    _sub.cancel();
+   // _sub.cancel();
     super.dispose();
   }
 
@@ -70,12 +76,16 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     final done = _editing
         ? IconButton(onPressed: _stopEditing, icon: Icon(Icons.save))
         : IconButton(onPressed: _startEditing, icon: Icon(Icons.edit));
-    final result = Scaffold(
+
+    final addButton = IconButton(icon: Icon(Icons.add), onPressed: _addText);
+
+    return Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
         title: ZefyrLogo(),
         actions: [
           done,
+          addButton,
           PopupMenuButton<_Options>(
             itemBuilder: buildPopupMenu,
             onSelected: handlePopupItemSelected,
@@ -83,19 +93,48 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
         ],
       ),
       body: ZefyrScaffold(
-        child: ZefyrEditor(
-          controller: _controller,
-          focusNode: _focusNode,
-          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-          imageDelegate: CustomImageDelegate(),
-          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
+        child: SingleChildScrollView(
+          child: 
+              Container(
+                height: 1000,
+                width: 500,
+                child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: richTextString.length + 1,
+                    physics: BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      
+                      if (index == richTextString.length) {
+                        return SizedBox(
+                          height: 1500
+                        );
+                      } else {
+                        return EditSection(
+                          currentText: richTextString[index],
+                          currentIndex: index,
+                          key: ObjectKey(richTextString[index]),);
+                      }
+                      
+                      // return ZefyrEditor(
+                      //   controller: _richController,
+                      //   focusNode: _focusNode,
+                      //   mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+                      //   imageDelegate: CustomImageDelegate(),
+                      //   keyboardAppearance:
+                      //       _darkTheme ? Brightness.dark : Brightness.light,
+                      // );
+                    }
+                  
+          ),
+              ),
         ),
       ),
     );
-    if (_darkTheme) {
-      return Theme(data: ThemeData.dark(), child: result);
-    }
-    return Theme(data: ThemeData(primarySwatch: Colors.cyan), child: result);
+
+    // if (_darkTheme) {
+    //   return Theme(data: ThemeData.dark(), child: result);
+    // }
+    // return Theme(data: ThemeData(primarySwatch: Colors.cyan), child: result);
   }
 
   void handlePopupItemSelected(value) {
@@ -117,6 +156,14 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     ];
   }
 
+  void _addText() {
+
+    final addDoc = r'[{"insert":"New Text \n testing new text body testing new text body \n testing new text body testing new text body \n testing new text body testing new text body \n"}]';
+    this.setState(() {
+      richTextString.add(addDoc);
+    });
+  }
+
   void _startEditing() {
     setState(() {
       _editing = true;
@@ -127,5 +174,62 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     setState(() {
       _editing = false;
     });
+  }
+}
+
+class EditSection extends StatefulWidget {
+  String currentText;
+  int currentIndex;
+  Key key;
+
+  EditSection({
+    this.currentText,
+    this.currentIndex,
+    this.key,
+  }): super(key: key);
+
+  @override 
+  _EditSectionState createState() => _EditSectionState();
+}
+
+class _EditSectionState extends State<EditSection> {
+ZefyrController _richController;
+StreamSubscription<NotusChange> _sub;
+FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    NotusDocument document =
+            NotusDocument.fromJson(json.decode(widget.currentText));
+        setState(() {
+          _richController = ZefyrController(document);
+          });
+    _sub = _richController.document.changes.listen((change) {
+      print('${change.source}: ${change.change}');
+      this.setState(() {
+        widget.currentText = jsonEncode(_richController.document);
+      });
+      
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ZefyrEditor(
+                      controller: _richController,
+                      focusNode: _focusNode,
+                      autofocus: false,
+                      imageDelegate: null,
+                      
+                      //physics: ClampingScrollPhysics(),
+                    );
   }
 }

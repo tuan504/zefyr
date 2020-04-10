@@ -230,9 +230,9 @@ class BlockTheme {
     String fontFamily;
     switch (themeData.platform) {
       case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        fontFamily = 'Menlo';
-        break;
+      // case TargetPlatform.macOS:
+      //   fontFamily = 'Menlo';
+      //   break;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         fontFamily = 'Roboto Mono';

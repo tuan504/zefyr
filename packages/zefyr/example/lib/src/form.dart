@@ -23,13 +23,8 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final form = ListView(
-      children: <Widget>[
-        TextField(decoration: InputDecoration(labelText: 'Name')),
-        buildEditor(),
-        TextField(decoration: InputDecoration(labelText: 'Email')),
-      ],
-    );
+    final form = 
+        buildEditor();
 
     final result = Scaffold(
       resizeToAvoidBottomPadding: true,

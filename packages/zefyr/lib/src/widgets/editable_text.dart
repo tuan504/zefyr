@@ -38,7 +38,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.focusNode,
     @required this.imageDelegate,
     this.selectionControls,
-    this.autofocus = true,
+    this.autofocus = false,
     this.mode = ZefyrMode.edit,
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.physics,
@@ -185,6 +185,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   @override
   void initState() {
+    print('init new text');
     _focusNode = widget.focusNode;
     super.initState();
     _focusAttachment = _focusNode.attach(context);
